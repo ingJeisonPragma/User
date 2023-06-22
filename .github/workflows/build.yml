@@ -9,7 +9,7 @@ env:
   AWS_REGION: 'us-east-2'
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ECR_REPO_NAME: 'Microuser-env-1' #nombre del repositorio ECR
+  AWS_ECR_REPO_NAME: 'microuser' #nombre del repositorio ECR
   AWS_ECR_REPO_LINK: '010467000068.dkr.ecr.us-east-2.amazonaws.com/microuser' #
   AWS_ECR_REPO_PATH: '010467000068.dkr.ecr.us-east-2.amazonaws.com' #URI ECR
   AWS_EB_ENVIRONMENT: 'Microuser-env-1' #Ambiente EB
