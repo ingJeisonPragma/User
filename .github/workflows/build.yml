@@ -9,11 +9,12 @@ env:
   AWS_REGION: 'us-east-2'
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ECR_REPO_NAME: 'microuser' #nombre del repositorio ECR
-  AWS_ECR_REPO_LINK: '010467000068.dkr.ecr.us-east-2.amazonaws.com/microuser' #
-  AWS_ECR_REPO_PATH: '010467000068.dkr.ecr.us-east-2.amazonaws.com' #URI ECR
-  AWS_EB_ENVIRONMENT: 'Microuser-env-1' #Ambiente EB
-  AWS_EB_APPLICATION: 'microuser' #aplicacion EB AWS
+  AWS_ECR_REPO_NAME: ${{ secrets.AWS_ECR_REPO_NAME }} #Nombre del repositorio ECR
+  AWS_ECR_REPO_LINK: ${{ secrets.AWS_ECR_REPO_LINK }} #URI ECR + Name
+  AWS_ECR_REPO_PATH: ${{ secrets.AWS_ECR_REPO_PATH }} #URI ECR
+  AWS_EB_ENVIRONMENT: ${{ secrets.AWS_EB_ENVIRONMENT }} #Ambiente EB
+  AWS_EB_APPLICATION: ${{ secrets.AWS_EB_APPLICATION }} #Aplicacion EB
+  GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }} #Aplicacion EB
 jobs:
   build:
     name: Build and analyze
@@ -69,8 +70,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: Build and push Docker image to ECR
         uses: aws-actions/amazon-ecr-login@v1
@@ -79,7 +80,13 @@ jobs:
           aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ${{ env.AWS_ECR_REPO_PATH }}
           docker build -t ${{ env.AWS_ECR_REPO_NAME }} .
           docker tag ${{ env.AWS_ECR_REPO_NAME }}:latest ${{ env.AWS_ECR_REPO_LINK }}:latest
-          docker push ${{ env.AWS_ECR_REPO_LINK }}:latest         
+          docker push ${{ env.AWS_ECR_REPO_LINK }}:latest
+      - name: SendMessage
+        if: always() && steps.deploy.outcome == 'failure'
+        uses: teknatha136/actions-google-chat-text-message@main
+        with:
+            google-chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+            text-message: Error desplegando el ECR. Ambiente- ${{ env.AWS_ECR_REPO_LINK }}.
   deploy-eb:
     needs: deploy-ecr
     runs-on: ubuntu-latest
@@ -100,4 +107,9 @@ jobs:
           use_existing_version_if_available: true
           region: ${{ env.AWS_REGION }}
           deployment_package: deploy.zip         # only use for set the latest versions
-          #use_existing_version_if_available: true
+      - name: SendMessage
+        if: always() && steps.deploy.outcome == 'failure'
+        uses: teknatha136/actions-google-chat-text-message@main
+        with:
+            google-chat-webhook: ${{ secrets.GOOGLE_CHAT_WEBHOOK }} 
+            text-message: Error deplegando el EB. Ambiente- ${{ env.AWS_EB_ENVIRONMENT }}. App- ${{ env.AWS_EB_APPLICATION }}
