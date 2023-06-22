@@ -1,0 +1,6 @@
+<AnalysisConfig>
+  <!-- Configuración general -->
+  <SonarQubeHost>https://sonarcloud.io</SonarQubeHost>
+  <SonarQubeProjectKey>secrets.SONAR_TOKEN</SonarQubeProjectKey>
+  <SonarQubeProjectName>PlazoletaComidas</SonarQubeProjectName>
+</AnalysisConfig>
