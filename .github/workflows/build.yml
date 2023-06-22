@@ -6,7 +6,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 env:
-  AWS_REGION: 'us-east-2'
+  AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ECR_REPO_NAME: ${{ secrets.AWS_ECR_REPO_NAME }} #Nombre del repositorio ECR
@@ -14,7 +14,7 @@ env:
   AWS_ECR_REPO_PATH: ${{ secrets.AWS_ECR_REPO_PATH }} #URI ECR
   AWS_EB_ENVIRONMENT: ${{ secrets.AWS_EB_ENVIRONMENT }} #Ambiente EB
   AWS_EB_APPLICATION: ${{ secrets.AWS_EB_APPLICATION }} #Aplicacion EB
-  GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }} #Aplicacion EB
+  GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }} #Chat google
 jobs:
   build:
     name: Build and analyze
